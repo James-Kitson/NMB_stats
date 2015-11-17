@@ -24,11 +24,11 @@ library(scales)
 ########################################################################################
 
 ### read in the data
-my.reads<-read.csv(file="metaBEAT.tsv", sep="\t", stringsAsFactors=FALSE, header=TRUE)
+my.reads<-read.csv(file=paste("DATA/metaBEAT.tsv",sep=""), sep="\t", stringsAsFactors=FALSE, header=TRUE)
 #colnames(my.reads)
 
 ### read in the sample by plate data
-my.plates<-read.csv(file="/Volumes/JK BACKUPS/Illumina Data/OPM_MiSeq1/Samples_and_MIDS_corrected.txt",
+my.plates<-read.csv(file="DATA/Samples_and_MIDS_corrected.txt",
                     sep="\t", stringsAsFactors=FALSE, header=TRUE)
 
 ### trim the plate data to the necessary columns
@@ -43,7 +43,7 @@ my.plates<-my.plates[,1:4]
 colnames(my.plates)<-c("sample","plate","plate.numeric","nest")
 
 ### set a minimum occurance for an assignment to be trusted
-occurance=5
+occurance=1
 
 ### subset the data frame to drop all assignments occuring fewer than the frequency specified above
 my.reads.subs<-subset(my.reads, subset = rowSums(my.reads[2:ncol(my.reads)] > 0) > occurance)
@@ -63,10 +63,10 @@ my.reads.trans$nest.numeric<-my.plates$nest.numeric[match(my.reads.trans$sample,
 
 ### Pull out the aissignments for further manual examination
 my.assignments<-colnames(my.reads.trans)
-write.csv(my.assignments, file="assignments_out.csv")
+write.csv(my.assignments, file="DATA/assignments_out.csv")
 
 ### Pull in the assigned colours as a .csv
-Taxa.col<-read.csv("assignments_in.csv")
+Taxa.col<-read.csv("DATA/assignments_in.csv", stringsAsFactors=FALSE)
 
 ### drop the OPM NuMts and the higher order Thaumetopoea hits
 #my.reads.trans<-my.reads.trans[,c(1:13,16:21)]
@@ -94,7 +94,7 @@ my.reads.trans$sample<-as.factor(my.reads.trans$sample)
 my.reads.trans$plate<-as.factor(my.reads.trans$plate)
 
 ### total all the reads
-my.reads.trans$total<-rowSums(my.reads.trans[c(2:15)])
+my.reads.trans$total<-rowSums(my.reads.trans[c(2:7)])
 ### calculate the percentage of reads in each well that are OPM
 my.reads.trans$Percent.Thau<-(my.reads.trans$Thaumetopoea_processionea/my.reads.trans$total)*100
 ### work out a 20% of reads inclusion cutoff
@@ -106,8 +106,8 @@ my.reads.trans$Percent.Thau<-(my.reads.trans$Thaumetopoea_processionea/my.reads.
 ### subset the data frame to drop all coloumns containing only zeros
 ###my.reads.trans.drop<-cbind(my.reads.trans[,c(1, 34:39)], subset(my.reads.trans[,c(2:33)], select = colSums(my.reads.trans[,c(2:33)]) !=0))
 
-### remove the total and variables
-my.reads.trans.drop<-my.reads.trans[,c(1:19,21)]
+### remove the total variable
+my.reads.trans.drop<-my.reads.trans[,c(1:11,13)]
 
 ### reorder my.reads.melt by both percentage Thau and plate
 #my.reads.melt<-my.reads.melt[order(my.reads.melt$Plate.numeric,-my.reads.melt$Percent.Thau),]
@@ -163,7 +163,7 @@ vivid.colours<-c("#FFFF00",              # moth colour
 vivid.colours2<-as.character(Taxa.col$Colour)
 
 ### count the columns greater than zero and write to a new data frame
-hit.hist<-data.frame(OTUs = rowSums(my.reads.trans.samps.only[c(2:4,8,9)] != 0), Type=my.reads.trans.samps.only$type)
+hit.hist<-data.frame(OTUs = rowSums(my.reads.trans.samps.only[c(2:7)] != 0), Type=my.reads.trans.samps.only$type)
 
 
 ########################################################################################
