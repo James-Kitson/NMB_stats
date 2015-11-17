@@ -25,7 +25,6 @@ library(scales)
 
 ### read in the data
 my.reads<-read.csv(file=paste("DATA/metaBEAT.tsv",sep=""), sep="\t", stringsAsFactors=FALSE, header=TRUE)
-#colnames(my.reads)
 
 ### read in the sample by plate data
 my.plates<-read.csv(file="DATA/Samples_and_MIDS_corrected.txt",
@@ -68,17 +67,6 @@ write.csv(my.assignments, file="DATA/assignments_out.csv")
 ### Pull in the assigned colours as a .csv
 Taxa.col<-read.csv("DATA/assignments_in.csv", stringsAsFactors=FALSE)
 
-### drop the OPM NuMts and the higher order Thaumetopoea hits
-#my.reads.trans<-my.reads.trans[,c(1:13,16:21)]
-
-### combine the higer order hits
-#my.reads.trans$higher.order.hits<-apply(my.reads.trans[,c(2,3,5,6,9:13)], MARGIN=1, FUN=sum)
-### combine the positive hits
-#my.reads.trans$positive.hits<-apply(my.reads.trans[,c(4,8,15)], MARGIN=1, FUN=sum)
-
-### Drop all the hits we've just combined
-#my.reads.trans<-my.reads.trans[,c(1,7,14,16:21)]
-
 my.reads.trans$type<-ifelse(my.reads.trans$nest=="Negative","Negative",
                             ifelse(my.reads.trans$nest=="DNApositive","DNApositive",
                                    ifelse(my.reads.trans$nest=="PCRpositive","PCRpositive","Sample")))
@@ -111,7 +99,7 @@ my.reads.trans.drop<-my.reads.trans[,c(1:11,13)]
 
 ### reorder my.reads.melt by both percentage Thau and plate
 #my.reads.melt<-my.reads.melt[order(my.reads.melt$Plate.numeric,-my.reads.melt$Percent.Thau),]
-my.reads.trans.drop<-my.reads.trans.drop[order(-my.reads.trans.drop$Percent.Thau),]
+my.reads.trans.drop<-my.reads.trans.drop[order(-my.reads.trans.drop$Percent.Thau,my.reads.trans.drop$Carcelia_iliaca),]
 
 ### make a panel factor after setting the decreasing OPM order
 my.reads.trans.drop$panel<-as.factor(c(rep(1,times=960/3),
@@ -144,27 +132,11 @@ my.reads.melt$Species <- factor(my.reads.melt$Species, Taxa.col$Assignment)
 
 levels(my.reads.melt$Species)
 
-### create a nice colour scale using colourRampPalette and RColorBrewer
-### jet.colors3 <- colorRampPalette(brewer.pal(length(unique(my.reads.melt$Species)), "Spectral"))
-
-### create a nice colour scale manually
-colours<-c("#FFFF75",              # moth colour
-           "#FFA375",              # Carcelia colour
-           "#33AD5C",              # Bad hit colours
-           "#3366FF",              # Positive colours
-           "#000000")              # unassigned
-
-vivid.colours<-c("#FFFF00",              # moth colour
-                 "#FF3300",              # Carcelia colour
-                 "#009933",              # Bad hit colours
-                 "#0000FF",              # Positive colours
-                 "#000000")              # unassigned
-
+### create a nice colour scale using colourRampPalette and RColorBrewer - eventually
 vivid.colours2<-as.character(Taxa.col$Colour)
 
 ### count the columns greater than zero and write to a new data frame
 hit.hist<-data.frame(OTUs = rowSums(my.reads.trans.samps.only[c(2:7)] != 0), Type=my.reads.trans.samps.only$type)
-
 
 ########################################################################################
 ################### make a plot of % composition by PCR plate  ######################################
