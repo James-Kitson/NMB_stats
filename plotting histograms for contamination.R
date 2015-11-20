@@ -68,9 +68,6 @@ my.reads.trans.subs$total<-rowSums(my.reads.trans.subs[c(2:7)])
 ### calculate the % of each well that each assignment makes
 my.reads.trans.subs[,10:15]<-my.reads.trans.subs[,2:7]/my.reads.trans.subs$total*100
 
-###get rid of the NaNs caused by dividing by zero in the failed reactions
-
-
 ### label the columns appropriately
 colnames(my.reads.trans.subs)<-gsub(".1", "_percentage", colnames(my.reads.trans.subs))
 
@@ -78,7 +75,10 @@ colnames(my.reads.trans.subs)<-gsub(".1", "_percentage", colnames(my.reads.trans
 my.reads.trans.subs<-my.reads.trans.subs[,c(1:8,10:15)]
 
 ### calculate the maximum % of each sample that any +ve assignment makes
-my.reads.trans.subs$cutoff<-apply(my.reads.trans.subs[, c(9,11,13)], 1, max)
+my.reads.trans.subs$cutoff<-apply(my.reads.trans.subs[, c(2,4,6)], 1, max)
+
+### replace all the species that are less than 20% of the total reads with zero
+#my.reads.trans[,2:16][my.reads.trans[,2:16] < my.reads.trans$cutoff] <- 0
 
 ### melt the data twice on each of reads and percentages
 read.depth<-melt(my.reads.trans.subs[,1:8], id.vars=c("sample","plate.numeric"),variable.name="species", value.name="reads")
