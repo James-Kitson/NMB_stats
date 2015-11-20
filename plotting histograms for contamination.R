@@ -81,4 +81,4 @@ hl + geom_histogram(aes(fill=factor(species)), alpha=1) +
   labs(x = "Read Depth", y = "Frequency")
 
 ### save the graph to an svg plot
-ggsave(filename="Read_depth_distribution_kernel_density.svg")
+ggsave(filename="Read_depth_distribution_histogram.svg")
