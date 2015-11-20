@@ -55,27 +55,38 @@ my.reads.trans$sample<-as.character(my.reads.trans$sample)
 my.reads.trans$type<-my.plates$type[match(my.reads.trans$sample,my.plates$sample)]
 my.reads.trans$type.numeric<-my.plates$type.numeric[match(my.reads.trans$sample,my.plates$sample)]
 
-### subset the data to only contain the sampel data and dropt the type variable
+### use match to add the plate.numeric data to the read data
+my.reads.trans$plate.numeric<-my.plates$plate.numeric[match(my.reads.trans$sample,my.plates$sample)]
+my.reads.trans$plate.numeric.numeric<-my.plates$plate.numeric.numeric[match(my.reads.trans$sample,my.plates$sample)]
+
+### subset the data to only contain the sample data and drop the type variable
 my.reads.trans.subs<-subset(my.reads.trans, my.reads.trans$type=="Sample", select=-type)
 
 ### calculate a total read depth for each sample
 my.reads.trans.subs$total<-rowSums(my.reads.trans.subs[c(2:7)])
 
 ### calculate the % of each well that each assignment makes
-my.reads.trans.subs[,9:14]<-my.reads.trans.subs[,2:7]/my.reads.trans.subs$total*100
+my.reads.trans.subs[,10:15]<-my.reads.trans.subs[,2:7]/my.reads.trans.subs$total*100
+
+###get rid of the NaNs caused by dividing by zero in the failed reactions
+
+
 ### label the columns appropriately
 colnames(my.reads.trans.subs)<-gsub(".1", "_percentage", colnames(my.reads.trans.subs))
 
 ### drop the total variable as we don't need it in the stacked data
-my.reads.trans.subs<-my.reads.trans.subs[,c(1:7,9:14)]
+my.reads.trans.subs<-my.reads.trans.subs[,c(1:8,10:15)]
+
+### calculate the maximum % of each sample that any +ve assignment makes
+my.reads.trans.subs$cutoff<-apply(my.reads.trans.subs[, c(9,11,13)], 1, max)
 
 ### melt the data twice on each of reads and percentages
-read.depth<-melt(my.reads.trans.subs[,1:7], id.vars="sample",variable.name="species", value.name="reads")
-percentages<-melt(my.reads.trans.subs[,c(1,8:13)], id.vars="sample",variable.name="species", value.name="percentage")
+read.depth<-melt(my.reads.trans.subs[,1:8], id.vars=c("sample","plate.numeric"),variable.name="species", value.name="reads")
+percentages<-melt(my.reads.trans.subs[,c(1,8:14)], id.vars=c("sample","plate.numeric"),variable.name="species", value.name="percentage")
 
 ### bind all this together to give the full long format data
 my.reads.trans.melt<-cbind(read.depth,percentages$percentage)
-colnames(my.reads.trans.melt)<-c("sample","species","reads","percentage")
+colnames(my.reads.trans.melt)<-c("sample","plate.numeric","species","reads","percentage")
 
 ### create a nice colour scale using colourRampPalette and RColorBrewer
 colors <-brewer.pal(length(unique(my.reads.trans.melt$species)), "Set3")
@@ -87,7 +98,7 @@ colors <-brewer.pal(length(unique(my.reads.trans.melt$species)), "Set3")
 ### make the ggplot object
 reads.plot<-ggplot(my.reads.trans.melt, aes(x=reads))
 ### add the kernal density plots
-reads.plot + geom_histogram(aes(fill=factor(species)), alpha=1) +
+reads.plot + geom_histogram(aes(fill=factor(species)), alpha=1, binwidth=30, origin=-15) +
   ### give the legend a sensible name
   scale_fill_discrete(name="BLAST assignment") +
   ### separate by clustering similarity threshold
@@ -105,7 +116,7 @@ ggsave(filename="Diagrams/Read_depth_distribution_histogram.svg")
 ### make the ggplot object
 percentage.plot<-ggplot(my.reads.trans.melt, aes(x=percentage))
 ### add the kernal density plots
-percentage.plot + geom_histogram(aes(fill=factor(species)), alpha=1) +
+percentage.plot + geom_histogram(aes(fill=factor(species)), alpha=1,binwidth=5, origin=-2.5) +
   ### give the legend a sensible name
   scale_fill_discrete(name="BLAST assignment") +
   ### separate by clustering similarity threshold
