@@ -77,18 +77,17 @@ percentages<-melt(my.reads.trans.subs[,c(1,8:13)], id.vars="sample",variable.nam
 my.reads.trans.melt<-cbind(read.depth,percentages$percentage)
 colnames(my.reads.trans.melt)<-c("sample","species","reads","percentage")
 
+### create a nice colour scale using colourRampPalette and RColorBrewer
+colors <-brewer.pal(length(unique(my.reads.trans.melt$species)), "Set3")
+
 ###########################################################################
 ### Plot histograms of each assignment read depth panelled by assignment
 ###########################################################################
 
-### create a nice colour scale using colourRampPalette and RColorBrewer
-colors <-brewer.pal(length(unique(my.reads.trans.melt$species)), "Set3")
-
-############## plotting order highest to lowest threshold - hashed out to only select preferred order
 ### make the ggplot object
-hl<-ggplot(my.reads.trans.melt, aes(x=reads))
+reads.plot<-ggplot(my.reads.trans.melt, aes(x=reads))
 ### add the kernal density plots
-hl + geom_histogram(aes(fill=factor(species)), alpha=1) +
+reads.plot + geom_histogram(aes(fill=factor(species)), alpha=1) +
   ### give the legend a sensible name
   scale_fill_discrete(name="BLAST assignment") +
   ### separate by clustering similarity threshold
@@ -97,17 +96,16 @@ hl + geom_histogram(aes(fill=factor(species)), alpha=1) +
   labs(x = "Read Depth", y = "Frequency")
 
 ### save the graph to an svg plot
-ggsave(filename="Read_depth_distribution_histogram.svg")
+ggsave(filename="Diagrams/Read_depth_distribution_histogram.svg")
 
 ###########################################################################
 ### Plot the data as % of each well for sample wells only
 ###########################################################################
 
-############## plotting order highest to lowest threshold - hashed out to only select preferred order
 ### make the ggplot object
-hl<-ggplot(my.reads.trans.melt, aes(x=percentage))
+percentage.plot<-ggplot(my.reads.trans.melt, aes(x=percentage))
 ### add the kernal density plots
-hl + geom_histogram(aes(fill=factor(species)), alpha=1) +
+percentage.plot + geom_histogram(aes(fill=factor(species)), alpha=1) +
   ### give the legend a sensible name
   scale_fill_discrete(name="BLAST assignment") +
   ### separate by clustering similarity threshold
@@ -116,6 +114,6 @@ hl + geom_histogram(aes(fill=factor(species)), alpha=1) +
   labs(x = "Percentage of reads in well", y = "Frequency")
 
 ### save the graph to an svg plot
-ggsave(filename="Percentage_depth_distribution_histogram.svg")
+ggsave(filename="Diagrams/Percentage_depth_distribution_histogram.svg")
   
   
