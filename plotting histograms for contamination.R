@@ -43,7 +43,7 @@ my.plates$type<-ifelse(my.plates$nest=="Negative","Negative",
                                    ifelse(my.plates$nest=="PCRpositive","PCRpositive","Sample")))
 
 ###########################################################################
-### process the data
+### process the data as read depths
 ###########################################################################
 
 ### transpose the read data
@@ -58,8 +58,24 @@ my.reads.trans$type.numeric<-my.plates$type.numeric[match(my.reads.trans$sample,
 ### subset the data to only contain the sampel data and dropt the type variable
 my.reads.trans.subs<-subset(my.reads.trans, my.reads.trans$type=="Sample", select=-type)
 
-### melt the data into long format
-my.reads.trans.melt<-melt(my.reads.trans.subs, id.vars="sample",variable.name="species", value.name="reads")
+### calculate a total read depth for each sample
+my.reads.trans.subs$total<-rowSums(my.reads.trans.subs[c(2:7)])
+
+### calculate the % of each well that each assignment makes
+my.reads.trans.subs[,9:14]<-my.reads.trans.subs[,2:7]/my.reads.trans.subs$total*100
+### label the columns appropriately
+colnames(my.reads.trans.subs)<-gsub(".1", "_percentage", colnames(my.reads.trans.subs))
+
+### drop the total variable as we don't need it in the stacked data
+my.reads.trans.subs<-my.reads.trans.subs[,c(1:7,9:14)]
+
+### melt the data twice on each of reads and percentages
+read.depth<-melt(my.reads.trans.subs[,1:7], id.vars="sample",variable.name="species", value.name="reads")
+percentages<-melt(my.reads.trans.subs[,c(1,8:13)], id.vars="sample",variable.name="species", value.name="percentage")
+
+### bind all this together to give the full long format data
+my.reads.trans.melt<-cbind(read.depth,percentages$percentage)
+colnames(my.reads.trans.melt)<-c("sample","species","reads","percentage")
 
 ###########################################################################
 ### Plot histograms of each assignment read depth panelled by assignment
@@ -82,3 +98,24 @@ hl + geom_histogram(aes(fill=factor(species)), alpha=1) +
 
 ### save the graph to an svg plot
 ggsave(filename="Read_depth_distribution_histogram.svg")
+
+###########################################################################
+### Plot the data as % of each well for sample wells only
+###########################################################################
+
+############## plotting order highest to lowest threshold - hashed out to only select preferred order
+### make the ggplot object
+hl<-ggplot(my.reads.trans.melt, aes(x=percentage))
+### add the kernal density plots
+hl + geom_histogram(aes(fill=factor(species)), alpha=1) +
+  ### give the legend a sensible name
+  scale_fill_discrete(name="BLAST assignment") +
+  ### separate by clustering similarity threshold
+  facet_wrap(~species, scales="free", ncol=2) +
+  ### set nice axis labels
+  labs(x = "Percentage of reads in well", y = "Frequency")
+
+### save the graph to an svg plot
+ggsave(filename="Percentage_depth_distribution_histogram.svg")
+  
+  
