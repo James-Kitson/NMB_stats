@@ -166,7 +166,13 @@ well.composition<-ggplot(data=my.reads.melt, aes(x=Sample, y=Reads, fill=Species
   ### set the colours
   # scale_fill_manual(name="Species",
   #                    values = jet.colors3(length(unique(my.reads.melt$Species)))) +
-  scale_fill_manual(name=unique(my.reads.melt$Species), values = my.colours) +
+  scale_fill_manual(name="Species", labels=c("Thaumetopoea processionea",
+                                             "Carcelia iliaca",
+                                             "Astatotilapia calliptera",
+                                             "Comaster audax",
+                                             "Triops cancriformis",
+                                             "unassigned"),
+                    values = my.colours) +
   ### add a sensible y axis label
   labs(y = "% of reads per well", x="PCR wells") +
   ### rotate the x-axis labels and resize the text for the svg
@@ -177,7 +183,7 @@ well.composition<-ggplot(data=my.reads.melt, aes(x=Sample, y=Reads, fill=Species
         legend.text = element_text(size = rel(1), face="italic"),
         legend.title = element_text(size = rel(1)),
         strip.text.x = element_blank(),
-        legend.position = "right")
+        legend.position = "bottom")
 
 
 ### Make a ggplot object of our OTU counts
