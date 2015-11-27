@@ -45,7 +45,7 @@ colnames(my.plates)<-c("sample","plate","plate.numeric","nest")
 occurance=1
 
 ### subset the data frame to drop all assignments occuring fewer than the frequency specified above
-my.reads.subs<-subset(my.reads, subset = rowSums(my.reads[2:ncol(my.reads)] > 0) > occurance)
+my.reads.subs<-subset(my.reads, subset = rowSums(my.reads[2:ncol(my.reads)] > 0) >= occurance)
 
 ### transpose the read data
 my.reads.trans<-recast(my.reads.subs, variable~OTU_ID)
@@ -61,11 +61,11 @@ my.reads.trans$nest<-my.plates$nest[match(my.reads.trans$sample,my.plates$sample
 my.reads.trans$nest.numeric<-my.plates$nest.numeric[match(my.reads.trans$sample,my.plates$sample)]
 
 ### Pull out the aissignments for further manual examination
-my.assignments<-colnames(my.reads.trans)
-write.csv(my.assignments, file="DATA/assignments_out.csv")
+###my.assignments<-colnames(my.reads.trans)
+###write.csv(my.assignments, file="DATA/assignments_out.csv")
 
 ### Pull in the assigned colours as a .csv
-Taxa.col<-read.csv("DATA/assignments_in.csv", stringsAsFactors=FALSE)
+###Taxa.col<-read.csv("DATA/assignments_in.csv", stringsAsFactors=FALSE)
 
 my.reads.trans$type<-ifelse(my.reads.trans$nest=="Negative","Negative",
                             ifelse(my.reads.trans$nest=="DNApositive","DNApositive",
@@ -82,7 +82,7 @@ my.reads.trans$sample<-as.factor(my.reads.trans$sample)
 my.reads.trans$plate<-as.factor(my.reads.trans$plate)
 
 ### total all the reads
-my.reads.trans$total<-rowSums(my.reads.trans[c(2:7)])
+my.reads.trans$total<-rowSums(my.reads.trans[c(2:9)])
 ### calculate the percentage of reads in each well that are OPM
 my.reads.trans$Percent.Thau<-(my.reads.trans$Thaumetopoea_processionea/my.reads.trans$total)*100
 ### work out a 20% of reads inclusion cutoff
@@ -95,7 +95,7 @@ my.reads.trans$Percent.Thau<-(my.reads.trans$Thaumetopoea_processionea/my.reads.
 ###my.reads.trans.drop<-cbind(my.reads.trans[,c(1, 34:39)], subset(my.reads.trans[,c(2:33)], select = colSums(my.reads.trans[,c(2:33)]) !=0))
 
 ### remove the total variable
-my.reads.trans.drop<-my.reads.trans[,c(1:11,13)]
+my.reads.trans.drop<-my.reads.trans[,c(1:13,15)]
 
 ### reorder my.reads.melt by both percentage Thau and plate
 #my.reads.melt<-my.reads.melt[order(my.reads.melt$Plate.numeric,-my.reads.melt$Percent.Thau),]
@@ -114,29 +114,36 @@ colnames(my.reads.melt)<-c("Sample","Plate","Plate.numeric","Percent.Thau","Nest
 my.reads.melt$level.order<-seq(1, length(my.reads.melt$Percent.Thau),1)
 
 ### order the species for plotting the legend
-#my.reads.melt$Species <- factor(my.reads.melt$Species,
-#                      levels=c("Thaumetopoea.processionea",
-#                               "Triops.cancriformis",
-#                               "Comaster.audax",
-#                               "Astatotilapia.calliptera",
-#                               "Bilateria",
-#                               "Pancrustacea",
-#                               "nohit"))
+my.reads.melt$Species <- factor(my.reads.melt$Species,
+                          levels=c("Thaumetopoea_processionea",
+                                   "Carcelia_iliaca",
+                                   "Pimpla_rufipes",
+                                   "Pteromalidae_sp1",
+                                   "Astatotilapia_calliptera",
+                                   "Comaster_audax",
+                                   "Triops_cancriformis",
+                                   "unassigned"))
+
+### order the species for plotting the legend
+my.colours <- c("#FFFF33",
+                    "#377EB8",
+                    "#4DAF4A",
+                    "#984EA3",
+                    "#E41A1C",
+                    "#E41A1C",
+                    "#E41A1C",
+                    "#000000")                            
 
 ### order the samples from highest OPM % to lowest and in increasing plate number
 my.reads.melt$Sample <- reorder(my.reads.melt$Sample, my.reads.melt$level.order)
 ### order the plates from lowest to highest
 #my.reads.melt$Plate <- reorder(my.reads.melt$Plate, my.reads.melt$Plate.numeric)
 
-my.reads.melt$Species <- factor(my.reads.melt$Species, Taxa.col$Assignment)
-
-levels(my.reads.melt$Species)
-
 ### create a nice colour scale using colourRampPalette and RColorBrewer - eventually
-vivid.colours2<-as.character(Taxa.col$Colour)
+vivid.colours2<-brewer.pal(length(unique(my.reads.melt$Species)),"Set1")
 
 ### count the columns greater than zero and write to a new data frame
-hit.hist<-data.frame(OTUs = rowSums(my.reads.trans.samps.only[c(2:7)] != 0), Type=my.reads.trans.samps.only$type)
+hit.hist<-data.frame(OTUs = rowSums(my.reads.trans.samps.only[c(2:9)] != 0), Type=my.reads.trans.samps.only$type)
 
 ########################################################################################
 ################### make a plot of % composition by PCR plate  ######################################
@@ -153,7 +160,7 @@ well.composition<-ggplot(data=my.reads.melt, aes(x=Sample, y=Reads, fill=Species
   ### set the colours
   # scale_fill_manual(name="Species",
   #                    values = jet.colors3(length(unique(my.reads.melt$Species)))) +
-  scale_fill_manual(name=as.character(Taxa.col$Assignment), values = vivid.colours2) +
+  scale_fill_manual(name=unique(my.reads.melt$Species), values = my.colours) +
   ### add a sensible y axis label
   labs(y = "% of reads per well", x="PCR wells") +
   ### rotate the x-axis labels and resize the text for the svg
