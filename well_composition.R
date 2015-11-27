@@ -81,7 +81,7 @@ my.reads.trans$total<-rowSums(my.reads.trans[c(2:9)])
 my.reads.trans$Percent.Thau<-(my.reads.trans$Thaumetopoea_processionea/my.reads.trans$total)*100
 
 ### set a minimum read coverage for accepting an assignment
-cutoff<-300
+cutoff<-200
 
 ### replace all the species that are less than the cutoff of the total reads with zero
 my.reads.trans[,2:9][my.reads.trans[,2:9] < cutoff] <- 0
