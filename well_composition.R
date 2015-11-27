@@ -71,12 +71,6 @@ my.reads.trans$type<-ifelse(my.reads.trans$nest=="Negative","Negative",
                             ifelse(my.reads.trans$nest=="DNApositive","DNApositive",
                                    ifelse(my.reads.trans$nest=="PCRpositive","PCRpositive","Sample")))
 
-### to remove the positive and negative samples for OTU counting in a barplot, I need to iteratively subset them out using the nest column.
-### I've not found a more elegant way of doing this yet
-my.reads.trans.samps.only<-my.reads.trans[my.reads.trans$nest != "Negative", ]
-my.reads.trans.samps.only<-my.reads.trans.samps.only[my.reads.trans.samps.only$nest != "DNApositive", ]
-my.reads.trans.samps.only<-my.reads.trans.samps.only[my.reads.trans.samps.only$nest != "PCRpositive", ]
-
 ### make sample and plate factors for faceting and ordering
 my.reads.trans$sample<-as.factor(my.reads.trans$sample)
 my.reads.trans$plate<-as.factor(my.reads.trans$plate)
@@ -85,21 +79,34 @@ my.reads.trans$plate<-as.factor(my.reads.trans$plate)
 my.reads.trans$total<-rowSums(my.reads.trans[c(2:9)])
 ### calculate the percentage of reads in each well that are OPM
 my.reads.trans$Percent.Thau<-(my.reads.trans$Thaumetopoea_processionea/my.reads.trans$total)*100
-### work out a 20% of reads inclusion cutoff
-#my.reads.trans$cutoff<-my.reads.trans$total*0.2
 
-### replace all the species that are less than 20% of the total reads with zero
-#my.reads.trans[,2:16][my.reads.trans[,2:16] < my.reads.trans$cutoff] <- 0
+### set a minimum read coverage for accepting an assignment
+cutoff<-300
+
+### replace all the species that are less than the cutoff of the total reads with zero
+my.reads.trans[,2:9][my.reads.trans[,2:9] < cutoff] <- 0
 
 ### subset the data frame to drop all coloumns containing only zeros
-###my.reads.trans.drop<-cbind(my.reads.trans[,c(1, 34:39)], subset(my.reads.trans[,c(2:33)], select = colSums(my.reads.trans[,c(2:33)]) !=0))
+my.reads.trans.nozero<-cbind(my.reads.trans[,c(1, 10:15)], subset(my.reads.trans[,c(2:9)], select = colSums(my.reads.trans[,c(2:9)]) !=0))
 
 ### remove the total variable
-my.reads.trans.drop<-my.reads.trans[,c(1:13,15)]
+my.reads.trans.drop<-my.reads.trans.nozero[,c(1:5,7:13)]
+
+### to remove the positive and negative samples for OTU counting in a barplot, I need to iteratively subset them out using the nest column.
+### I've not found a more elegant way of doing this yet
+my.reads.trans.samps.only<-my.reads.trans.drop[my.reads.trans$nest != "Negative", ]
+my.reads.trans.samps.only<-my.reads.trans.samps.only[my.reads.trans.samps.only$nest != "DNApositive", ]
+my.reads.trans.samps.only<-my.reads.trans.samps.only[my.reads.trans.samps.only$nest != "PCRpositive", ]
+
+### order the type for ordering the samples in the plot
+my.reads.trans.drop$type <- factor(my.reads.trans.drop$type,
+                                   levels=c("Sample","DNApositive","PCRpositive","Negative"))
 
 ### reorder my.reads.melt by both percentage Thau and plate
 #my.reads.melt<-my.reads.melt[order(my.reads.melt$Plate.numeric,-my.reads.melt$Percent.Thau),]
-my.reads.trans.drop<-my.reads.trans.drop[order(-my.reads.trans.drop$Percent.Thau,my.reads.trans.drop$Carcelia_iliaca),]
+my.reads.trans.drop<-my.reads.trans.drop[order(-my.reads.trans.drop$Percent.Thau,my.reads.trans.drop$Carcelia_iliaca,my.reads.trans.drop$type),]
+
+my.reads.trans.drop <- my.reads.trans.drop[order(my.reads.trans.drop$type, -xtfrm(my.reads.trans.drop$Percent.Thau), my.reads.trans.drop$Carcelia_iliaca), ]
 
 ### make a panel factor after setting the decreasing OPM order
 my.reads.trans.drop$panel<-as.factor(c(rep(1,times=960/3),
@@ -113,12 +120,13 @@ colnames(my.reads.melt)<-c("Sample","Plate","Plate.numeric","Percent.Thau","Nest
 ### create an ID variable for the order
 my.reads.melt$level.order<-seq(1, length(my.reads.melt$Percent.Thau),1)
 
+### see what species remain after filtering
+levels(my.reads.melt$Species)
+
 ### order the species for plotting the legend
 my.reads.melt$Species <- factor(my.reads.melt$Species,
                           levels=c("Thaumetopoea_processionea",
                                    "Carcelia_iliaca",
-                                   "Pimpla_rufipes",
-                                   "Pteromalidae_sp1",
                                    "Astatotilapia_calliptera",
                                    "Comaster_audax",
                                    "Triops_cancriformis",
@@ -127,8 +135,6 @@ my.reads.melt$Species <- factor(my.reads.melt$Species,
 ### order the species for plotting the legend
 my.colours <- c("#FFFF33",
                     "#377EB8",
-                    "#4DAF4A",
-                    "#984EA3",
                     "#E41A1C",
                     "#E41A1C",
                     "#E41A1C",
@@ -143,12 +149,12 @@ my.reads.melt$Sample <- reorder(my.reads.melt$Sample, my.reads.melt$level.order)
 vivid.colours2<-brewer.pal(length(unique(my.reads.melt$Species)),"Set1")
 
 ### count the columns greater than zero and write to a new data frame
-hit.hist<-data.frame(OTUs = rowSums(my.reads.trans.samps.only[c(2:9)] != 0), Type=my.reads.trans.samps.only$type)
+hit.hist<-data.frame(OTUs = rowSums(my.reads.trans.samps.only[c(7:12)] != 0), Type=my.reads.trans.samps.only$type)
 
 ########################################################################################
 ################### make a plot of % composition by PCR plate  ######################################
 ########################################################################################
-svg(file="well_composition_reads_by_plate.svg", width=10, height=8)
+svg(file="Diagrams/well_composition_reads_by_plate.svg", width=10, height=8)
 ### set up the ggplot
 well.composition<-ggplot(data=my.reads.melt, aes(x=Sample, y=Reads, fill=Species)) +
   ### make it a stacked barplot and set the bars to be the same height
