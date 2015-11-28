@@ -6,7 +6,7 @@
 rm(list=ls())
 
 ### set working directory
-setwd("/Volumes/JK BACKUPS/Illumina Data/OPM_MiSeq1/OPM_Illumina_output/Filtered run/")
+setwd("/Volumes/JK GEL/OPM_run1_filtered_cluster_test/")
 
 ### load the libraries you need
 library(reshape2)
@@ -69,10 +69,10 @@ ggsave(filename="proportion_summary.svg")
 ########################################################################################
 
 ### read in the data
-###my.clust<-read.csv("combined_reads_stats.csv")
+my.clust<-read.csv("combined_reads_stats.csv", stringsAsFactors=FALSE)
 
 ### read in the intermediate data
-my.clust<-read.csv("combined_reads_stats_filter.csv", stringsAsFactors=FALSE)
+###my.clust<-read.csv("combined_reads_stats_filter.csv", stringsAsFactors=FALSE)
 
 ### set a grouping variable for the data type
 my.clust$type<-ifelse(grepl("DNA",my.clust$sample),"DNApositive",
@@ -83,8 +83,6 @@ my.clust$type<-ifelse(grepl("DNA",my.clust$sample),"DNApositive",
 
 my.clust.subs<-subset(my.clust, my.clust$type=="Moth sample",
                       select=c("cluster_thres", "clusters_min_cov", "cluster_above_thres"))
-
-
 
 #my.clust.subs<-subset(my.clust,
 #                      grepl(paste("-", c("positive", "Negative"), sep="", collapse= "|"), my.clust$sample),
