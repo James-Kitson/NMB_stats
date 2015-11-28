@@ -27,7 +27,7 @@ my.reads<-read.csv(file="DATA/reads_stats.csv", stringsAsFactors=FALSE, header=T
 #colnames(my.reads)
 
 ### read in the sample by plate data
-my.plates<-read.csv(file="/Volumes/JK BACKUPS/Illumina Data/OPM_MiSeq1/Samples_and_MIDS_corrected.txt",
+my.plates<-read.csv(file="DATA/Samples_and_MIDS_corrected.txt",
                     sep="\t", stringsAsFactors=FALSE, header=TRUE)
 
 ### trim the plate data to the necessary columns

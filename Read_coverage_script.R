@@ -6,7 +6,7 @@
 rm(list=ls())
 
 ### set working directory
-setwd("/Volumes/JK GEL/OPM_run1_filtered_cluster_test/")
+setwd("~/Documents/Projects/OPM project/R_analyses/NMB_stats")
 
 ### load the libraries you need
 library(reshape2)
