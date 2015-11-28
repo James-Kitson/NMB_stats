@@ -87,7 +87,7 @@ ggplot(aes(y = value, x = plate, fill = variable), data = my.reads.subs.melt) +
         legend.position = "right")
 
 ### save the graph to an svg plot
-ggsave(filename="filtered_trimming_summary_all_samples.svg")
+ggsave(filename="Diagrams/filtered_trimming_summary_all_samples.svg")
 
 ########################################################################################
 ################### Plot the data excluding the +ves and -ves  ###########################
@@ -113,7 +113,39 @@ ggplot(aes(y = value, x = plate, fill = variable), data = subset(my.reads.subs.m
         legend.position = "right")
 
 ### save the graph to an svg plot
-ggsave(filename="filtered_trimming_summary_moths_only.svg")
+ggsave(filename="Diagrams/filtered_trimming_summary_moths_only.svg")
+
+########################################################################################
+################### Plot the data by sample type  ###########################
+########################################################################################
+### order the sample types for plotting
+my.reads.subs.melt$type <- factor(my.reads.subs.melt$type,
+                                levels=c("Moth sample",
+                                         "DNApositive",
+                                         "PCRpositive",
+                                         "negative"))
+
+### make the ggplot object + add the jittered dots + add the boxplots and colour them by trim level and make them a bit transparent
+ggplot(aes(y = value, x = type, fill = variable), data = my.reads.subs.melt) +
+  ### make the boxplot and suppress the outliers as we are plotting the points anyway
+  geom_boxplot(aes(fill=variable), alpha=0.5, position = position_dodge(width = 0.85), outlier.shape = NA) +
+  ### plot the points
+  geom_point(pch = 21, position = position_jitterdodge()) +
+  ### fix the axes titles
+  labs(y = "Reads per PCR well", x="PCR plate") +
+  scale_fill_discrete(name="Trim level",
+                      breaks=c("total", "trimmed.total"),
+                      labels=c("Raw reads", "Trimmed reads")) +
+  ### rotate the x-axis labels and resize the text for the svg
+  theme(axis.text.x = element_text(size = rel(1.9)),
+        axis.text.y = element_text(size = rel(1.9)),
+        axis.title = element_text(size = rel(2)),
+        legend.text = element_text(size = rel(1.9)),
+        legend.title = element_text(size = rel(1.9)),
+        legend.position = "right")
+
+### save the graph to an svg plot
+ggsave(filename="Diagrams/filtered_trimming_summary_sample_types.svg")
 
 ####################################################################################################################################
 ################################## counting reads etc ##############################################################################
