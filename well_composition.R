@@ -199,3 +199,11 @@ c<- ggplot(hit.hist, aes(factor(reorder(OTUs, -OTUs)))) +
 grid.arrange(well.composition, c, heights=c(3/4, 1/4), ncol=1)
 
 dev.off()
+
+########################################################################################
+# work out percentage parasitism with carcelia #
+########################################################################################
+
+### divide the number of well containing Carcelia by all well that are not +ve or -ve to get percentage
+percent.cacelia<-(colSums(my.reads.trans[3] > 0)/919)*100
+
