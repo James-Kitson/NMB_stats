@@ -178,9 +178,9 @@ well.composition<-ggplot(data=my.reads.melt, aes(x=Sample, y=Reads, fill=Species
   ### rotate the x-axis labels and resize the text for the svg
   theme(axis.text.x = element_blank(),
         axis.ticks.x=element_blank(),
-        axis.text.y = element_text(size = rel(2), colour="black"),
-        axis.title.y = element_text(size = rel(2), vjust=2),
-        axis.title.x = element_text(size = rel(2), vjust=-1.3),
+        axis.text.y = element_text(size = rel(1.1), colour="black"),
+        axis.title.y = element_text(size = rel(1), vjust=2),
+        axis.title.x = element_text(size = rel(1), vjust=-1.3),
         legend.text = element_text(size = rel(1), face="italic"),
         legend.title = element_text(size = rel(1)),
         strip.text.x = element_blank(),
@@ -191,7 +191,7 @@ well.composition<-ggplot(data=my.reads.melt, aes(x=Sample, y=Reads, fill=Species
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         axis.line = element_blank(),
-        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
         plot.margin=unit(c(0.1, 0.1, 1, 1), "lines"))
 
 ### Make a ggplot object of our OTU counts
@@ -199,9 +199,9 @@ c<- ggplot(hit.hist, aes(factor(reorder(OTUs, -OTUs)))) +
   geom_bar(alpha=0.5, fill="#3399ff") + labs(y = "Frequency", x="OTUs per well") +
   coord_flip() +
   ### rotate the x-axis labels and resize the text for the svg
-  theme(axis.text = element_text(size = rel(2), colour="black"),
-        axis.title.y = element_text(size = rel(2), vjust=2),
-        axis.title.x = element_text(size = rel(2), vjust=-1),
+  theme(axis.text = element_text(size = rel(1.1), colour="black"),
+        axis.title.y = element_text(size = rel(1), vjust=2),
+        axis.title.x = element_text(size = rel(1), vjust=-1),
         panel.grid.minor = element_blank(),
         axis.line = element_blank(),
         plot.margin=unit(c(0.1, 0.1, 1, 1), "lines"))
