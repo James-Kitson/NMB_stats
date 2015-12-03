@@ -81,18 +81,20 @@ ggplot(aes(y = value, x = plate, fill = variable), data = my.reads.subs.melt) +
   ### rotate the x-axis labels and resize the text for the svg
   theme(axis.text.x = element_text(size = rel(1.9), colour="black"),
         axis.text.y = element_text(size = rel(1.9), colour="black"),
-        axis.title.y = element_text(size = rel(2), vjust=0.8),
-        axis.title.x = element_text(size = rel(2), vjust=-0.1),
+        axis.title.y = element_text(size = rel(2), vjust=2),
+        axis.title.x = element_text(size = rel(2), vjust=-1.3),
         legend.text = element_text(size = rel(1.9)),
         legend.title = element_text(size = rel(1.9), vjust=1),
         legend.position = "right",
         legend.key.height=unit(1.5,"line"),
+        legend.key=element_blank(),
         legend.background = element_blank(),
         panel.background = element_blank(),
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         axis.line = element_blank(),
-        panel.border = element_rect(colour = "black", fill=NA, size=1))
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        plot.margin=unit(c(0.1, 0.1, 1, 1), "lines"))
 
 ### save the graph to an svg plot
 ggsave(filename="Diagrams/filtered_trimming_summary_all_samples.svg")
@@ -115,18 +117,20 @@ ggplot(aes(y = value, x = plate, fill = variable), data = subset(my.reads.subs.m
   ### rotate the x-axis labels and resize the text for the svg
   theme(axis.text.x = element_text(size = rel(1.9), colour="black"),
         axis.text.y = element_text(size = rel(1.9), colour="black"),
-        axis.title.y = element_text(size = rel(2), vjust=0.8),
-        axis.title.x = element_text(size = rel(2), vjust=-0.1),
+        axis.title.y = element_text(size = rel(2), vjust=2),
+        axis.title.x = element_text(size = rel(2), vjust=-1.3),
         legend.text = element_text(size = rel(1.9)),
         legend.title = element_text(size = rel(1.9), vjust=1),
         legend.position = "right",
         legend.key.height=unit(1.5,"line"),
+        legend.key=element_blank(),
         legend.background = element_blank(),
         panel.background = element_blank(),
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         axis.line = element_blank(),
-        panel.border = element_rect(colour = "black", fill=NA, size=1))
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        plot.margin=unit(c(0.1, 0.1, 1, 1), "lines"))
 
 ### save the graph to an svg plot
 ggsave(filename="Diagrams/filtered_trimming_summary_moths_only.svg")
@@ -155,18 +159,20 @@ ggplot(aes(y = value, x = type, fill = variable), data = my.reads.subs.melt) +
   ### rotate the x-axis labels and resize the text for the svg
   theme(axis.text.x = element_text(size = rel(1.9), colour="black"),
         axis.text.y = element_text(size = rel(1.9), colour="black"),
-        axis.title.y = element_text(size = rel(2), vjust=0.8),
-        axis.title.x = element_text(size = rel(2), vjust=-0.1),
+        axis.title.y = element_text(size = rel(2), vjust=2),
+        axis.title.x = element_text(size = rel(2), vjust=-1.3),
         legend.text = element_text(size = rel(1.9)),
         legend.title = element_text(size = rel(1.9), vjust=1),
         legend.position = "right",
         legend.key.height=unit(1.5,"line"),
+        legend.key=element_blank(),
         legend.background = element_blank(),
         panel.background = element_blank(),
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         axis.line = element_blank(),
-        panel.border = element_rect(colour = "black", fill=NA, size=1))
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        plot.margin=unit(c(0.1, 0.1, 1, 1), "lines"))
 
 
 ### save the graph to an svg plot
