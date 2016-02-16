@@ -24,10 +24,10 @@ library(scales)
 ########################################################################################
 
 ### read in the data
-my.reads<-read.csv(file=paste("DATA/metaBEAT.tsv",sep=""), sep="\t", stringsAsFactors=FALSE, header=TRUE)
+my.reads<-read.csv(file=paste("DATA/OPM2/metaBEAT-processed.tsv",sep=""), sep="\t", stringsAsFactors=FALSE, header=TRUE)
 
 ### read in the sample by plate data
-my.plates<-read.csv(file="DATA/Samples_and_MIDS_corrected.txt",
+my.plates<-read.csv(file="DATA/OPM2/OPM2_PlateDATA.csv",
                     sep="\t", stringsAsFactors=FALSE, header=TRUE)
 
 ### trim the plate data to the necessary columns
