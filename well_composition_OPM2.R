@@ -17,6 +17,7 @@ library(grid)
 library(gridExtra)
 library(RColorBrewer)
 library(scales)
+library(lme4)
 
 
 ########################################################################################
@@ -219,3 +220,28 @@ dev.off()
 ### divide the number of well containing Carcelia by all well that are not +ve or -ve to get percentage
 percent.cacelia<-(colSums(my.reads.trans[3] > 0)/1151)*100
 
+
+########################################################################################
+# Test for difference in OTU number across MyFi and MyTaq #
+########################################################################################
+
+### read in the read stats for the enzyme comparison
+Reads<-read.csv("DATA/OPM2/reads_stats_tag_comparison.csv")
+
+Reads$ratio<-Reads$cluster_above_thres/Reads$queries
+
+### add a variable for enzyme
+Reads$enzyme<-ifelse(grepl("R", Reads$sample), "MyTaq", "MyFi")
+
+### remove the R suffix for MyTaq
+Reads$sample<-gsub("R","", Reads$sample)
+
+### drop everything other than the grouping variable and the clusters retained
+Reads.subs<-subset(Reads, select=c("sample", "ratio", "enzyme"))
+
+
+
+ggplot(Reads.subs, aes(x= enzyme, y=ratio)) +
+  geom_boxplot()
+
+t.test(Reads.subs$ratio~Reads.subs$enzyme)
