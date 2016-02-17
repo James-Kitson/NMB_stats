@@ -25,7 +25,7 @@ library(lme4)
 ########################################################################################
 
 ### read in the data
-my.reads<-read.csv(file=paste("DATA/OPM2/metaBEAT-processed.tsv",sep=""), sep="\t", stringsAsFactors=FALSE, header=TRUE)
+my.reads<-read.csv(file=paste("DATA/OPM2/0.97_similarity/metaBEAT-processed.tsv",sep=""), sep="\t", stringsAsFactors=FALSE, header=TRUE)
 
 ### read in the sample by plate data
 my.plates<-read.csv(file="DATA/OPM2/OPM2_PlateDATA.csv",
@@ -134,7 +134,7 @@ my.reads.melt$Species <- factor(my.reads.melt$Species,
                           levels=c("Thaumetopoea_processionea",
                                    "Carcelia_iliaca",
                                    "Astatotilapia_calliptera",
-                                   "Triops_cancriformis",
+                                   "Triops",
                                    "unassigned"))
 
 ### order the species for plotting the legend
@@ -158,7 +158,7 @@ hit.hist<-data.frame(OTUs = rowSums(my.reads.trans.samps.only[c(2,8:11)] != 0), 
 ########################################################################################
 ################### make a plot of % composition by PCR plate  ######################################
 ########################################################################################
-svg(file="Diagrams/well_composition_reads_by_plate_OPM2.svg", width=10, height=8)
+svg(file="Diagrams/well_composition_reads_by_plate_OPM2_0.97.svg", width=10, height=8)
 ### set up the ggplot
 well.composition<-ggplot(data=my.reads.melt, aes(x=Sample, y=Reads, fill=Species)) +
   ### make it a stacked barplot and set the bars to be the same height
